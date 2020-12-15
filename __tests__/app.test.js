@@ -9,8 +9,8 @@ describe('recipe-lab routes', () => {
     return pool.query(fs.readFileSync('./sql/setup.sql', 'utf-8'));
   });
 
-  it('creates a recipe', () => {
-    return request(app)
+  it('creates a recipe', async () => {
+    return await request(app)
       .post('/api/v1/recipes')
       .send({
         name: 'cookies',
@@ -35,7 +35,7 @@ describe('recipe-lab routes', () => {
       });
   });
 
-  it('gets all recipes', async() => {
+  it('gets all recipes', async () => {
     const recipes = await Promise.all([
       { name: 'cookies', directions: [] },
       { name: 'cake', directions: [] },
@@ -51,7 +51,21 @@ describe('recipe-lab routes', () => {
       });
   });
 
-  it('updates a recipe by id', async() => {
+  it('get an existing recipe by id', async () => {
+    const recipes = await Promise.all([
+      { name: 'cookies', directions: [] },
+      { name: 'cake', directions: [] },
+      { name: 'pie', directions: [] }
+    ].map(recipe => Recipe.insert(recipe)));
+
+    return request(app)
+      .get(`/api/v1/recipes/${recipes[0].id}`)
+      .then(res => {
+        expect(res.body).toEqual(recipes[0]);
+      });
+  });
+
+  it('updates a recipe by id', async () => {
     const recipe = await Recipe.insert({
       name: 'cookies',
       directions: [
@@ -84,6 +98,20 @@ describe('recipe-lab routes', () => {
             'bake for 10 minutes'
           ]
         });
+      });
+  });
+
+  it('deletes an existing recipe by id', async () => {
+    const recipes = await Promise.all([
+      { name: 'cookies', directions: [] },
+      { name: 'cake', directions: [] },
+      { name: 'pie', directions: [] }
+    ].map(recipe => Recipe.insert(recipe)));
+
+    return request(app)
+      .delete(`/api/v1/recipes/${recipes[0].id}`)
+      .then(res => {
+        expect(res.body).toEqual(recipes[0]);
       });
   });
 });
