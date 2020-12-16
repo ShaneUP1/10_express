@@ -56,7 +56,8 @@ describe('recipe-lab routes', () => {
       .get('/api/v1/recipes')
       .then(res => {
         recipes.forEach(recipe => {
-          expect(res.body).toContainEqual(recipe);
+          expect(res.body).toEqual(expect.arrayContaining(recipes));
+          expect(res.body).toHaveLength(recipes.length);
         });
       });
   });

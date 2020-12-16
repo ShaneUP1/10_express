@@ -31,6 +31,7 @@ describe('log routes', () => {
             })
             .then(res => {
                 expect(res.body).toEqual({
+                    id: expect.any(String),
                     dateOfEvent: expect.any(String),
                     notes: 'it was okay',
                     rating: 2,
@@ -51,15 +52,19 @@ describe('log routes', () => {
             { dateOfEvent: '2022-11-13', notes: 'hello', rating: 2, recipeId: `${recipes[1].id}` },
             { dateOfEvent: '2022-11-13', notes: 'bye', rating: 2, recipeId: `${recipes[2].id}` }
         ].map(recipe => Log.insert(recipe)));
-        const res = await request(app)
-            .get('/api/v1/logs');
 
-        expect(res.body).toEqual(expect.arrayContaining(logs));
-        expect(res.body).toHaveLength(logs.length);
+        return request(app)
+            .get('/api/v1/logs')
+            .then(res => {
+                logs.forEach(log => {
+                    expect(res.body).toEqual(expect.arrayContaining(logs));
+                    expect(res.body).toHaveLength(logs.length);
+                });
+            });
     });
 
 
-    it.only('get an existing log by id', async () => {
+    it('get an existing log by id', async () => {
         const recipes = await Promise.all([
             { name: 'cookies', directions: [], ingredients: [] },
             { name: 'cake', directions: [], ingredients: [] },
@@ -72,54 +77,43 @@ describe('log routes', () => {
             { dateOfEvent: '2022-11-13', notes: 'bye', rating: 2, recipeId: `${recipes[2].id}` }
         ].map(log => Log.insert(log)));
 
+
         return request(app)
-            .get(`/api/v1/logs/1`)
+            .get(`/api/v1/logs/${logs[0].id}`)
             .then(res => {
                 expect(res.body).toEqual(logs[0]);
             });
     });
 
-    it('updates a recipe by id', async () => {
-        const recipe = await Recipe.insert({
-            name: 'cookies',
-            directions: [
-                'preheat oven to 375',
-                'mix ingredients',
-                'put dough on cookie sheet',
-                'bake for 10 minutes'
-            ],
-            ingredients: [
-                { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
-            ]
+    it('updates a log by id', async () => {
+        const recipes = await Promise.all([
+            { name: 'cookies', directions: [], ingredients: [] },
+            { name: 'cake', directions: [], ingredients: [] },
+            { name: 'pie', directions: [], ingredients: [] }
+        ].map(recipe => Recipe.insert(recipe)));
+
+        const log = await Log.insert({
+            dateOfEvent: '2022-11-13',
+            notes: 'note here',
+            rating: 4,
+            recipeId: `${recipes[0].id}`
         });
 
         return request(app)
-            .put(`/api/v1/recipes/${recipe.id}`)
+            .put(`/api/v1/logs/${log.id}`)
             .send({
-                name: 'good cookies',
-                directions: [
-                    'preheat oven to 375',
-                    'mix ingredients',
-                    'put dough on cookie sheet',
-                    'bake for 10 minutes'
-                ],
-                ingredients: [
-                    { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
-                ]
+                dateOfEvent: '2022-11-13',
+                notes: 'note here',
+                rating: 4,
+                recipeId: `${recipes[0].id}`
             })
             .then(res => {
                 expect(res.body).toEqual({
                     id: expect.any(String),
-                    name: 'good cookies',
-                    directions: [
-                        'preheat oven to 375',
-                        'mix ingredients',
-                        'put dough on cookie sheet',
-                        'bake for 10 minutes'
-                    ],
-                    ingredients: [
-                        { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
-                    ]
+                    dateOfEvent: '2022-11-13',
+                    notes: 'note here',
+                    rating: 4,
+                    recipeId: `${recipes[0].id}`
                 });
             });
     });
