@@ -9,6 +9,7 @@ app.listen(PORT, () => {
 });
 
 process.on('exit', () => {
+  // eslint-disable-next-line no-console
   console.log('Goodbye!');
   pool.end();
 });

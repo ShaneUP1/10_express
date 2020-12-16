@@ -1,7 +1,17 @@
-DROP TABLE IF EXISTS recipes;
+DROP TABLE IF EXISTS recipes CASCADE;
+DROP TABLE IF EXISTS logs;
 
 CREATE TABLE recipes (
-  id BIGINT GENERATED ALWAYS AS IDENTITY,
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   name TEXT NOT NULL,
-  directions TEXT[]
+  directions TEXT[],
+  ingredients JSONB NOT NULL
+);
+
+CREATE TABLE logs (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  date_of_event DATE NOT NULL,
+  notes TEXT NOT NULL,
+  rating INT CHECK (rating > 1 AND rating < 5),
+  recipe_id BIGINT REFERENCES recipes(id)
 );

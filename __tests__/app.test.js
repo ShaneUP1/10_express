@@ -9,6 +9,10 @@ describe('recipe-lab routes', () => {
     return pool.query(fs.readFileSync('./sql/setup.sql', 'utf-8'));
   });
 
+  afterAll(() => {
+    return pool.end();
+  });
+
   it('creates a recipe', async () => {
     return await request(app)
       .post('/api/v1/recipes')
@@ -19,6 +23,9 @@ describe('recipe-lab routes', () => {
           'mix ingredients',
           'put dough on cookie sheet',
           'bake for 10 minutes'
+        ],
+        ingredients: [
+          { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
         ]
       })
       .then(res => {
@@ -30,6 +37,9 @@ describe('recipe-lab routes', () => {
             'mix ingredients',
             'put dough on cookie sheet',
             'bake for 10 minutes'
+          ],
+          ingredients: [
+            { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
           ]
         });
       });
@@ -37,9 +47,9 @@ describe('recipe-lab routes', () => {
 
   it('gets all recipes', async () => {
     const recipes = await Promise.all([
-      { name: 'cookies', directions: [] },
-      { name: 'cake', directions: [] },
-      { name: 'pie', directions: [] }
+      { name: 'cookies', directions: [], ingredients: [] },
+      { name: 'cake', directions: [], ingredients: [] },
+      { name: 'pie', directions: [], ingredients: [] }
     ].map(recipe => Recipe.insert(recipe)));
 
     return request(app)
@@ -53,9 +63,9 @@ describe('recipe-lab routes', () => {
 
   it('get an existing recipe by id', async () => {
     const recipes = await Promise.all([
-      { name: 'cookies', directions: [] },
-      { name: 'cake', directions: [] },
-      { name: 'pie', directions: [] }
+      { name: 'cookies', directions: [], ingredients: [] },
+      { name: 'cake', directions: [], ingredients: [] },
+      { name: 'pie', directions: [], ingredients: [] }
     ].map(recipe => Recipe.insert(recipe)));
 
     return request(app)
@@ -74,6 +84,9 @@ describe('recipe-lab routes', () => {
         'put dough on cookie sheet',
         'bake for 10 minutes'
       ],
+      ingredients: [
+        { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
+      ]
     });
 
     return request(app)
@@ -85,6 +98,9 @@ describe('recipe-lab routes', () => {
           'mix ingredients',
           'put dough on cookie sheet',
           'bake for 10 minutes'
+        ],
+        ingredients: [
+          { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
         ]
       })
       .then(res => {
@@ -96,6 +112,9 @@ describe('recipe-lab routes', () => {
             'mix ingredients',
             'put dough on cookie sheet',
             'bake for 10 minutes'
+          ],
+          ingredients: [
+            { 'name': 'flour', 'measurement': 'cup', 'amount': '1' }
           ]
         });
       });
@@ -103,9 +122,9 @@ describe('recipe-lab routes', () => {
 
   it('deletes an existing recipe by id', async () => {
     const recipes = await Promise.all([
-      { name: 'cookies', directions: [] },
-      { name: 'cake', directions: [] },
-      { name: 'pie', directions: [] }
+      { name: 'cookies', directions: [], ingredients: [] },
+      { name: 'cake', directions: [], ingredients: [] },
+      { name: 'pie', directions: [], ingredients: [] }
     ].map(recipe => Recipe.insert(recipe)));
 
     return request(app)
