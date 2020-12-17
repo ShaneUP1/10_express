@@ -21,7 +21,7 @@ describe('log routes', () => {
             { name: 'pie', directions: [], ingredients: [] }
         ].map(recipe => Recipe.insert(recipe)));
 
-        return await request(app)
+        return request(app)
             .post('/api/v1/logs')
             .send({
                 dateOfEvent: '2020-01-01',
@@ -53,7 +53,7 @@ describe('log routes', () => {
             { dateOfEvent: '2022-11-13', notes: 'bye', rating: 2, recipeId: `${recipes[2].id}` }
         ].map(recipe => Log.insert(recipe)));
 
-        return request(app)
+        return await request(app)
             .get('/api/v1/logs')
             .then(res => {
                 logs.forEach(log => {
@@ -110,7 +110,7 @@ describe('log routes', () => {
             .then(res => {
                 expect(res.body).toEqual({
                     id: expect.any(String),
-                    dateOfEvent: '2022-11-13',
+                    dateOfEvent: expect.any(String),
                     notes: 'note here',
                     rating: 4,
                     recipeId: `${recipes[0].id}`

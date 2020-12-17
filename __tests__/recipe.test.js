@@ -14,7 +14,7 @@ describe('recipe-lab routes', () => {
   });
 
   it('creates a recipe', async () => {
-    return await request(app)
+    return request(app)
       .post('/api/v1/recipes')
       .send({
         name: 'cookies',
@@ -47,17 +47,16 @@ describe('recipe-lab routes', () => {
 
   it('gets all recipes', async () => {
     const recipes = await Promise.all([
-      { name: 'cookies', directions: [], ingredients: [] },
-      { name: 'cake', directions: [], ingredients: [] },
-      { name: 'pie', directions: [], ingredients: [] }
+      { name: 'cookies', directions: [], ingredients: [{}] },
+      { name: 'cake', directions: [], ingredients: [{}] },
+      { name: 'pie', directions: [], ingredients: [{}] }
     ].map(recipe => Recipe.insert(recipe)));
 
     return request(app)
       .get('/api/v1/recipes')
       .then(res => {
         recipes.forEach(recipe => {
-          expect(res.body).toEqual(expect.arrayContaining(recipes));
-          expect(res.body).toHaveLength(recipes.length);
+          expect(res.body).toContainEqual(recipe);
         });
       });
   });
