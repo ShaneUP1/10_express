@@ -118,17 +118,23 @@ describe('log routes', () => {
             });
     });
 
-    it('deletes an existing recipe by id', async () => {
+    it('deletes an existing log by id', async () => {
         const recipes = await Promise.all([
             { name: 'cookies', directions: [], ingredients: [] },
             { name: 'cake', directions: [], ingredients: [] },
             { name: 'pie', directions: [], ingredients: [] }
         ].map(recipe => Recipe.insert(recipe)));
 
+        const logs = await Promise.all([
+            { dateOfEvent: '2022-11-13', notes: 'note', rating: 3, recipeId: `${recipes[0].id}` },
+            { dateOfEvent: '2022-11-13', notes: 'hello', rating: 2, recipeId: `${recipes[1].id}` },
+            { dateOfEvent: '2022-11-13', notes: 'bye', rating: 2, recipeId: `${recipes[0].id}` }
+        ].map(log => Log.insert(log)));
+
         return request(app)
-            .delete(`/api/v1/recipes/${recipes[0].id}`)
+            .delete(`/api/v1/logs/${logs[0].id}`)
             .then(res => {
-                expect(res.body).toEqual(recipes[0]);
+                expect(res.body).toEqual(logs[0]);
             });
     });
 });
