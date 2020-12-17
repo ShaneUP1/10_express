@@ -10,7 +10,7 @@ CREATE TABLE recipes (
 
 CREATE TABLE logs (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  date_of_event DATE NOT NULL,
+  date_of_event TEXT NOT NULL,
   notes TEXT NOT NULL,
   rating INT CHECK (rating > 1 AND rating < 5),
   recipe_id BIGINT REFERENCES recipes(id)

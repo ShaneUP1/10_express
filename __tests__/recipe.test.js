@@ -3,6 +3,8 @@ const pool = require('../lib/utils/pool');
 const request = require('supertest');
 const app = require('../lib/app');
 const Recipe = require('../lib/models/recipe');
+const Log = require('../lib/models/log');
+
 
 describe('recipe-lab routes', () => {
   beforeEach(() => {
@@ -14,7 +16,7 @@ describe('recipe-lab routes', () => {
   });
 
   it('creates a recipe', async () => {
-    return await request(app)
+    return request(app)
       .post('/api/v1/recipes')
       .send({
         name: 'cookies',
@@ -47,9 +49,9 @@ describe('recipe-lab routes', () => {
 
   it('gets all recipes', async () => {
     const recipes = await Promise.all([
-      { name: 'cookies', directions: [], ingredients: [] },
-      { name: 'cake', directions: [], ingredients: [] },
-      { name: 'pie', directions: [], ingredients: [] }
+      { name: 'cookies', directions: [], ingredients: [{}] },
+      { name: 'cake', directions: [], ingredients: [{}] },
+      { name: 'pie', directions: [], ingredients: [{}] }
     ].map(recipe => Recipe.insert(recipe)));
 
     return request(app)
@@ -68,12 +70,22 @@ describe('recipe-lab routes', () => {
       { name: 'pie', directions: [], ingredients: [] }
     ].map(recipe => Recipe.insert(recipe)));
 
+    const logs = await Promise.all([
+      { dateOfEvent: '2022-11-13', notes: 'note', rating: 3, recipeId: `${recipes[0].id}` },
+      { dateOfEvent: '2022-11-13', notes: 'hello', rating: 2, recipeId: `${recipes[0].id}` },
+      { dateOfEvent: '2022-11-13', notes: 'bye', rating: 2, recipeId: `${recipes[0].id}` }
+    ].map(log => Log.insert(log)));
+
     return request(app)
       .get(`/api/v1/recipes/${recipes[0].id}`)
       .then(res => {
-        expect(res.body).toEqual(recipes[0]);
+        expect(res.body).toEqual({
+          ...recipes[0],
+          logs: expect.arrayContaining(logs)
+        });
       });
   });
+
 
   it('updates a recipe by id', async () => {
     const recipe = await Recipe.insert({
